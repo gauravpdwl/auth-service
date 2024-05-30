@@ -1,0 +1,5 @@
+**Build docker image
+docker build -t auth-service:dev -f docker/development/Dockerfile .
+
+**run docker image for development
+docker run --rm -it -v $(pwd):/usr/src/app -v /usr/src/app/node_modules --env-file $(pwd)/.env -p 4560:4560 -e NODE_ENV=development auth-service:dev

@@ -10,7 +10,6 @@ const startServer = () => {
     // throw new Error("Something went wrong");
 
     app.listen(port, () => {
-      console.log("Hello");
       logger.info(`Listening on port ${port}`);
     });
   } catch (err) {
