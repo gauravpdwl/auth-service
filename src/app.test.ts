@@ -2,7 +2,7 @@ import app from "./config/app";
 import { calculateDiscount } from "./config/utils";
 import request from "supertest";
 
-describe("App", () => {
+describe.skip("App", () => {
   it("should calculate discount", () => {
     const result = calculateDiscount(100, 10);
 

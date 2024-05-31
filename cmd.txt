@@ -3,3 +3,8 @@ docker build -t auth-service:dev -f docker/development/Dockerfile .
 
 **run docker image for development
 docker run --rm -it -v $(pwd):/usr/src/app -v /usr/src/app/node_modules --env-file $(pwd)/.env -p 4560:4560 -e NODE_ENV=development auth-service:dev
+
+docker pull postgres
+docker volume create mernpgdata
+docker run --rm --name mern_postgres_dbserver -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v mernpgdata:/var/lib/postgresql/data -p 5432:5432 -d postgres:latest
+docker exec -it mern_postgres_dbserver psql db_name

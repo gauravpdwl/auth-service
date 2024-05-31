@@ -1,15 +1,17 @@
 import express, { NextFunction, Request, Response } from "express";
 import logger from "./logger";
 import { HttpError } from "http-errors";
+import { router as authRouter } from "../routes/auth";
 
 const app = express();
 
 app.get("/", (req, res) => {
   // const err=createHttpError(401, "You are not allowed to access the page");
   //   throw err;
-
   res.send("Welcome to Express Server");
 });
+
+app.use("/auth", authRouter);
 
 // global error handler middleware
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
