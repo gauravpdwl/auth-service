@@ -1,3 +1,7 @@
+**pre-commit
+. "$(dirname "$0")/husky.sh"
+npx lint-staged
+
 **Build docker image
 docker build -t auth-service:dev -f docker/development/Dockerfile .
 
