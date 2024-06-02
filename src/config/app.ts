@@ -2,12 +2,16 @@ import express, { NextFunction, Request, Response } from "express";
 import logger from "./logger";
 import { HttpError } from "http-errors";
 import { router as authRouter } from "../routes/auth";
+import "reflect-metadata";
 
 const app = express();
+
+app.use(express.json());
 
 app.get("/", (req, res) => {
   // const err=createHttpError(401, "You are not allowed to access the page");
   //   throw err;
+
   res.send("Welcome to Express Server");
 });
 
