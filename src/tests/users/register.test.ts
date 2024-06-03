@@ -133,7 +133,26 @@ describe("POST /auth/register", () => {
       expect(response.statusCode).toBe(400);
       expect(users).toHaveLength(1);
     });
+
+    it("should return access token", async () => {
+      const userData = {
+        firstName: "Gaurav",
+        lastName: "Padwal",
+        email: "gaurav@gmail.com",
+        password: "secret",
+      };
+
+      const response = await request(app).post("/auth/register").send(userData);
+
+      expect(response.statusCode).toBe(201);
+
+      // console.log(response.body)
+
+      expect(response.body).toHaveProperty("accessToken");
+    });
   });
+
+  //***********************************************************************************
 
   describe("fields are missing", () => {
     let connection: DataSource;
@@ -158,7 +177,7 @@ describe("POST /auth/register", () => {
       await connection.destroy();
     });
 
-    it("if email filed is empty then it should return 400 code", async () => {
+    it("if email field is empty then it should return 400 code", async () => {
       const userData = {
         firstName: "Gaurav",
         lastName: "Padwal",

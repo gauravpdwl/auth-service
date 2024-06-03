@@ -3,6 +3,7 @@ import { AppDataSource } from "../config/data-source";
 import { User } from "../entity/User";
 import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
+import jwt from "jsonwebtoken";
 
 interface userData {
   firstName: string;
@@ -41,7 +42,7 @@ export class AuthController {
       const saltRound = 10;
       const hashedPassword = await bcrypt.hash(password, saltRound);
 
-      await userRepository.save({
+      const newuser = await userRepository.save({
         firstName,
         lastName,
         email,
@@ -49,7 +50,21 @@ export class AuthController {
         role: "customer",
       });
 
-      res.status(201).json();
+      const secretKey = "secret";
+
+      const payload = {
+        userid: newuser.id,
+      };
+
+      const accessToken = jwt.sign(payload, secretKey, {
+        expiresIn: "1h",
+        algorithm: "HS256",
+      });
+
+      res.status(201).json({
+        message: "Registration Successful",
+        accessToken: accessToken,
+      });
     } catch (err) {
       next(err);
     }
