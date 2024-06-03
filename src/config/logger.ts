@@ -6,6 +6,10 @@ const logger = winston.createLogger({
   defaultMeta: {
     serviceName: "auth-service",
   },
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json(),
+  ),
   // it is used to send logs to console or cloud
   transports: [
     new winston.transports.File({
@@ -26,10 +30,6 @@ const logger = winston.createLogger({
 
     new winston.transports.Console({
       level: "info",
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json(),
-      ),
     }),
   ],
 });

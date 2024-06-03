@@ -4,6 +4,7 @@ import { User } from "../entity/User";
 import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
+import logger from "../config/logger";
 
 interface userData {
   firstName: string;
@@ -49,6 +50,8 @@ export class AuthController {
         password: hashedPassword,
         role: "customer",
       });
+
+      logger.info(`User is registered ${newuser.id}`);
 
       const secretKey = "secret";
 
@@ -96,6 +99,8 @@ export class AuthController {
         const err = createHttpError(404, "User or Password is incorrect");
         throw err;
       }
+
+      logger.info(`Login is successful for user ${user.id}`);
 
       const secretKey = "secret";
 
