@@ -1,11 +1,15 @@
 import app from "./config/app";
 import { Config } from "./config/config";
+import { AppDataSource } from "./config/data-source";
 import logger from "./config/logger";
 
-const startServer = () => {
+const startServer = async () => {
   const port = Config.port;
 
   try {
+    await AppDataSource.initialize();
+    logger.info("Database Connected Successfully");
+
     // to test the logger error transport
     // throw new Error("Something went wrong");
 

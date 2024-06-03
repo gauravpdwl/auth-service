@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --runInBand",
+    "test": "jest --watch --runInBand --detectOpenHandles",
     "prepare": "husky install",
     "dev": "cross-env node_env=dev nodemon src/server.ts",
     "prettycheck": "prettier . --check",

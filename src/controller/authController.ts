@@ -69,4 +69,57 @@ export class AuthController {
       next(err);
     }
   }
+
+  async login(req: RegisteredUser, res: Response, next: NextFunction) {
+    try {
+      const { email, password } = req.body;
+
+      if (!email) {
+        const err = createHttpError(400, "email field is empty");
+        throw err;
+      }
+
+      email.trim();
+      password.trim();
+
+      const userRepository = AppDataSource.getRepository(User);
+
+      const user = await userRepository.findOne({ where: { email: email } });
+      if (!user) {
+        const err = createHttpError(404, "User or Password is incorrect");
+        throw err;
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        const err = createHttpError(404, "User or Password is incorrect");
+        throw err;
+      }
+
+      const secretKey = "secret";
+
+      const payload = {
+        userid: user.id,
+      };
+
+      const accessToken = jwt.sign(payload, secretKey, {
+        expiresIn: "1h",
+        algorithm: "HS256",
+      });
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true, // Accessible only by the web server
+        secure: true, // Use secure cookies in production
+        maxAge: 3600000, // Cookie expiry in milliseconds (1 hour in this case)
+        sameSite: "strict", // Adjust based on your needs (strict, lax, none)
+      });
+
+      res.status(200).json({
+        message: "Login Successful",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
