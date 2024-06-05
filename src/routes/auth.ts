@@ -10,4 +10,8 @@ router.post("/register", (req, res, next) =>
 
 router.post("/login", (req, res, next) => authController.login(req, res, next));
 
+router.post("/self", (req, res) => {
+  authController.self(req, res);
+});
+
 export { router };

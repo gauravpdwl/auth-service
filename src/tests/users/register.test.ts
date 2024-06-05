@@ -5,7 +5,7 @@ import { AppDataSource } from "../../config/data-source";
 // import { truncateTables } from "../utilities";
 import { User } from "../../entity/User";
 
-describe.skip("POST /auth/register", () => {
+describe("POST /auth/register", () => {
   describe("given all fields", () => {
     let connection: DataSource;
 
@@ -142,13 +142,31 @@ describe.skip("POST /auth/register", () => {
         password: "secret",
       };
 
-      const response = await request(app).post("/auth/register").send(userData);
+      let accessToken = null;
+      let refreshToken = null;
 
-      expect(response.statusCode).toBe(201);
+      interface Headers {
+        ["set-cookie"]: string[];
+      }
+
+      const response = await request(app).post("/auth/register").send(userData);
+      const cookies =
+        (response.headers as unknown as Headers)["set-cookie"] || [];
+
+      cookies.forEach((cookie) => {
+        if (cookie.startsWith("accessToken=")) {
+          accessToken = cookie.split(";")[0].split("=")[1];
+        }
+
+        if (cookie.startsWith("refreshToken=")) {
+          refreshToken = cookie.split(";")[0].split("=")[1];
+        }
+      });
+
+      expect(accessToken).not.toBeNull();
+      expect(refreshToken).not.toBeNull();
 
       // console.log(response.body)
-
-      expect(response.body).toHaveProperty("accessToken");
     });
   });
 

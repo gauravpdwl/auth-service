@@ -11,6 +11,7 @@ const {
   dbusername,
   dbpassword,
   dbdatabasename,
+  refresh_secret_key,
 } = process.env;
 
 // console.log(node_env, dbhost, dbusername, dbpassword);
@@ -23,4 +24,5 @@ export const Config = {
   dbusername,
   dbpassword,
   dbdatabasename,
+  refresh_secret_key,
 };

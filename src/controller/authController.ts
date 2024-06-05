@@ -1,10 +1,13 @@
+import fs from "fs";
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entity/User";
 import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import logger from "../config/logger";
+import { Config } from "../config/config";
+import path from "path";
 
 interface userData {
   firstName: string;
@@ -51,22 +54,62 @@ export class AuthController {
         role: "customer",
       });
 
-      logger.info(`User is registered ${newuser.id}`);
+      (Config.node_env === "prod" || Config.node_env === "dev") &&
+        logger.info(`User is registered ${newuser.id}`);
 
-      const secretKey = "secret";
+      // const secretKey = "secret";
+      // const payload = {
+      //   userid: newuser.id,
+      // };
+      // const accessToken = jwt.sign(payload, secretKey, {
+      //   expiresIn: "1h",
+      //   algorithm: "HS256",
+      // });
+      let privatekey: Buffer;
 
-      const payload = {
-        userid: newuser.id,
+      try {
+        privatekey = fs.readFileSync(
+          path.join(__dirname, "../../certs/private.pem"),
+        );
+      } catch (err) {
+        const error = createHttpError(500, "Error while reading private key");
+        next(error);
+        return;
+      }
+
+      const payload: JwtPayload = {
+        sub: String(newuser.id),
+        role: newuser.role,
       };
 
-      const accessToken = jwt.sign(payload, secretKey, {
+      const accessToken = jwt.sign(payload, privatekey, {
+        algorithm: "RS256",
         expiresIn: "1h",
+        issuer: "auth-service",
+      });
+
+      const refreshToken = jwt.sign(payload, Config.refresh_secret_key!, {
         algorithm: "HS256",
+        expiresIn: "1y",
+        issuer: "auth-service",
+      });
+
+      res.cookie("accessToken", accessToken, {
+        domain: "localhost",
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60, //expires in 1h
+        httpOnly: true,
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        domain: "localhost",
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 365, //expires in 1Year
+        httpOnly: true,
       });
 
       res.status(201).json({
         message: "Registration Successful",
-        accessToken: accessToken,
       });
     } catch (err) {
       next(err);
@@ -100,7 +143,8 @@ export class AuthController {
         throw err;
       }
 
-      logger.info(`Login is successful for user ${user.id}`);
+      (Config.node_env === "prod" || Config.node_env === "dev") &&
+        logger.info(`Login is successful for user ${user.id}`);
 
       const secretKey = "secret";
 
@@ -126,5 +170,11 @@ export class AuthController {
     } catch (err) {
       next(err);
     }
+  }
+
+  async self(req: Request, res: Response) {
+    res.status(200).json({
+      message: "welcome",
+    });
   }
 }
