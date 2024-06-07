@@ -2,6 +2,7 @@ import fs from "fs";
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entity/User";
+import { RefreshToken } from "../entity/RefreshToken";
 import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -88,10 +89,20 @@ export class AuthController {
         issuer: "auth-service",
       });
 
+      // Persist the refresh token in DB
+
+      const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365;
+      const refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+      const newRefreshToken = await refreshTokenRepository.save({
+        user: newuser,
+        expiresAt: new Date(Date.now() + MS_IN_YEAR),
+      });
+
       const refreshToken = jwt.sign(payload, Config.refresh_secret_key!, {
         algorithm: "HS256",
         expiresIn: "1y",
         issuer: "auth-service",
+        jwtid: String(newRefreshToken.id),
       });
 
       res.cookie("accessToken", accessToken, {

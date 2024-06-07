@@ -4,6 +4,7 @@ import { DataSource } from "typeorm";
 import { AppDataSource } from "../../config/data-source";
 // import { truncateTables } from "../utilities";
 import { User } from "../../entity/User";
+import { RefreshToken } from "../../entity/RefreshToken";
 
 describe("POST /auth/register", () => {
   describe("given all fields", () => {
@@ -167,6 +168,22 @@ describe("POST /auth/register", () => {
       expect(refreshToken).not.toBeNull();
 
       // console.log(response.body)
+    });
+
+    it("Should store the refresh token in the database", async () => {
+      const userData = {
+        firstName: "Gaurav",
+        lastName: "Padwal",
+        email: "gaurav@gmail.com",
+        password: "secret",
+      };
+
+      await request(app).post("/auth/register").send(userData);
+
+      const refreshTokenRepo = connection.getRepository(RefreshToken);
+      const refreshTokens = await refreshTokenRepo.find();
+
+      expect(refreshTokens).toHaveLength(1);
     });
   });
 
