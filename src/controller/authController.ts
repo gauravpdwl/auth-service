@@ -129,10 +129,10 @@ export class AuthController {
 
   async login(req: RegisteredUser, res: Response, next: NextFunction) {
     try {
-      const { email, password } = req.body;
+      const {email, password } = req.body;
 
-      if (!email) {
-        const err = createHttpError(400, "email field is empty");
+      if (!email || !password) {
+        const err = createHttpError(400, "email or password field is empty");
         throw err;
       }
 
@@ -143,39 +143,73 @@ export class AuthController {
 
       const user = await userRepository.findOne({ where: { email: email } });
       if (!user) {
-        const err = createHttpError(404, "User or Password is incorrect");
+        const err = createHttpError(404, "Email or Password does not match");
         throw err;
       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch) {
-        const err = createHttpError(404, "User or Password is incorrect");
+      const passwordMatch=await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        const err = createHttpError(404, "Email or Password does not match");
         throw err;
       }
 
-      (Config.node_env === "prod" || Config.node_env === "dev") &&
-        logger.info(`Login is successful for user ${user.id}`);
+      let privatekey: Buffer;
 
-      const secretKey = "secret";
+      try {
+        privatekey = fs.readFileSync(
+          path.join(__dirname, "../../certs/private.pem"),
+        );
+      } catch (err) {
+        const error = createHttpError(500, "Error while reading private key");
+        next(error);
+        return;
+      }
 
-      const payload = {
-        userid: user.id,
+      const payload: JwtPayload = {
+        sub: String(user.id),
+        role: user.role,
       };
 
-      const accessToken = jwt.sign(payload, secretKey, {
+      const accessToken = jwt.sign(payload, privatekey, {
+        algorithm: "RS256",
         expiresIn: "1h",
+        issuer: "auth-service",
+      });
+
+      // Persist the refresh token in DB
+
+      const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365;
+      const refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+      const newRefreshToken = await refreshTokenRepository.save({
+        user: user,
+        expiresAt: new Date(Date.now() + MS_IN_YEAR),
+      });
+
+      const refreshToken = jwt.sign(payload, Config.refresh_secret_key!, {
         algorithm: "HS256",
+        expiresIn: "1y",
+        issuer: "auth-service",
+        jwtid: String(newRefreshToken.id),
       });
 
       res.cookie("accessToken", accessToken, {
-        httpOnly: true, // Accessible only by the web server
-        secure: true, // Use secure cookies in production
-        maxAge: 3600000, // Cookie expiry in milliseconds (1 hour in this case)
-        sameSite: "strict", // Adjust based on your needs (strict, lax, none)
+        domain: "localhost",
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60, //expires in 1h
+        httpOnly: true,
       });
 
+      res.cookie("refreshToken", refreshToken, {
+        domain: "localhost",
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 365, //expires in 1Year
+        httpOnly: true,
+      });
+
+      logger.info(`User is login successfully ${user.id}`);
+
       res.status(200).json({
+        id:user.id,
         message: "Login Successful",
       });
     } catch (err) {
