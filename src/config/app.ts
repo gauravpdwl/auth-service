@@ -4,8 +4,11 @@ import { HttpError } from "http-errors";
 import { router as authRouter } from "../routes/auth";
 import "reflect-metadata";
 import { Config } from "./config";
+import cookieParser from "cookie-parser";
 
 const app = express();
+
+app.use(cookieParser());
 
 app.use(express.json());
 

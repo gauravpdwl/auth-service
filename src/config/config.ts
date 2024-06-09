@@ -12,6 +12,7 @@ const {
   dbpassword,
   dbdatabasename,
   refresh_secret_key,
+  jwks_uri
 } = process.env;
 
 // console.log(node_env, dbhost, dbusername, dbpassword);
@@ -25,4 +26,5 @@ export const Config = {
   dbpassword,
   dbdatabasename,
   refresh_secret_key,
+  jwks_uri
 };

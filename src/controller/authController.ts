@@ -21,6 +21,13 @@ interface RegisteredUser extends Request {
   body: userData;
 }
 
+interface AuthRequest extends Request{
+    auth:{
+      sub:string;
+      role:number;
+    }   
+}
+
 export class AuthController {
   async register(req: RegisteredUser, res: Response, next: NextFunction) {
     try {
@@ -217,9 +224,15 @@ export class AuthController {
     }
   }
 
-  async self(req: Request, res: Response) {
-    res.status(200).json({
-      message: "welcome",
-    });
+  async self(req: AuthRequest, res: Response) {
+
+    console.log(req.auth);
+
+    const userRepository = AppDataSource.getRepository(User);
+    const user=await userRepository.findOneBy({id: Number(req.auth.sub)});
+
+    // console.log(user);
+
+    res.status(200).json(user?.id);
   }
 }
