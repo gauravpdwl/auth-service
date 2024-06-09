@@ -45,7 +45,7 @@ export class AuthController {
 
       const userRepository = AppDataSource.getRepository(User);
 
-      const user = await userRepository.findOne({ where: { email: email } });
+      const user = await userRepository.findOne({ where: { email: email }, select:["email","password"] });
       if (user) {
         const err = createHttpError(400, "User is already present in db");
         throw err;
@@ -148,7 +148,7 @@ export class AuthController {
 
       const userRepository = AppDataSource.getRepository(User);
 
-      const user = await userRepository.findOne({ where: { email: email } });
+      const user = await userRepository.findOne({ where: { email: email }, select:["email","password"] });
       if (!user) {
         const err = createHttpError(404, "Email or Password does not match");
         throw err;
@@ -226,12 +226,10 @@ export class AuthController {
 
   async self(req: AuthRequest, res: Response) {
 
-    console.log(req.auth);
+    // console.log(req.auth);
 
     const userRepository = AppDataSource.getRepository(User);
     const user=await userRepository.findOneBy({id: Number(req.auth.sub)});
-
-    // console.log(user);
 
     res.status(200).json(user?.id);
   }

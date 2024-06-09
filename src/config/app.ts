@@ -8,8 +8,8 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+app.use(express.static("public"));
 app.use(cookieParser());
-
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -27,7 +27,7 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   (Config.node_env === "prod" || Config.node_env === "dev") &&
     logger.error(err.message);
 
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || err.status || 500;
 
   res.status(statusCode).json({
     errors: [

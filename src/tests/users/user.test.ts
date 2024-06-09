@@ -71,5 +71,52 @@ describe("GET auth/self/", () => {
       expect(response.body as Record<string, string>).toBe(data.id);
     });
 
+    it("should not return the passwod field", async ()=>{
+      const registerData = {
+        firstName: "Gaurav",
+        lastName: "Padwal",
+        email: "gaurav@gmail.com",
+        password: "secret",
+      };
+
+      const userRepository=connection.getRepository(User);
+      const data=await userRepository.save({...registerData, role:"customer"});
+
+      // Generate token
+      const accessToken=jwks.token({sub: String(data.id), role:data.role});
+
+      // Add token to cookie
+
+      const response=await request(app)
+      .get("/auth/self")
+      .set("Cookie", [`accessToken=${accessToken};`])
+      .send();
+
+      expect(response.body as Record<string, string>).not.toHaveProperty('password')
+    })
+
+    it("should return 401 code if token not exists in request", async ()=>{
+      // const registerData = {
+      //   firstName: "Gaurav",
+      //   lastName: "Padwal",
+      //   email: "gaurav@gmail.com",
+      //   password: "secret",
+      // };
+
+      // const userRepository=connection.getRepository(User);
+      // const data=await userRepository.save({...registerData, role:"customer"});
+
+      // Generate token
+      // const accessToken=jwks.token({sub: String(data.id), role:data.role});
+
+      // Add token to cookie
+
+      const response=await request(app)
+      .get("/auth/self")
+      .send();
+
+      expect(response.statusCode).toBe(401);
+    })
+
   });
 });
