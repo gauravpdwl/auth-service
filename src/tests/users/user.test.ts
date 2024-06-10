@@ -96,15 +96,15 @@ describe("GET auth/self/", () => {
     })
 
     it("should return 401 code if token not exists in request", async ()=>{
-      // const registerData = {
-      //   firstName: "Gaurav",
-      //   lastName: "Padwal",
-      //   email: "gaurav@gmail.com",
-      //   password: "secret",
-      // };
+      const registerData = {
+        firstName: "Gaurav",
+        lastName: "Padwal",
+        email: "gaurav@gmail.com",
+        password: "secret",
+      };
 
-      // const userRepository=connection.getRepository(User);
-      // const data=await userRepository.save({...registerData, role:"customer"});
+      const userRepository=connection.getRepository(User);
+      await userRepository.save({...registerData, role:"customer"});
 
       // Generate token
       // const accessToken=jwks.token({sub: String(data.id), role:data.role});

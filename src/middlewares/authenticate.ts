@@ -26,6 +26,12 @@ export default expressjwt({
         }
 
         const {accessToken}=req.cookies as AuthCookies;
+
+        // if(!req.cookies){
+        //     const error= createHttpError(401, "No Access Token Found")
+        //     throw error;
+        // }
+
         return accessToken;
 
     }

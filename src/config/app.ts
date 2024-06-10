@@ -25,7 +25,9 @@ app.use("/auth", authRouter);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   (Config.node_env === "prod" || Config.node_env === "dev") &&
-    logger.error(err.message);
+  
+  console.log(err);
+  logger.error(err.message);
 
   const statusCode = err.statusCode || err.status || 500;
 
