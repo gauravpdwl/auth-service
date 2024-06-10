@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction } from "express";
 import { AuthController } from "../controller/authController";
 import authenticate from "../middlewares/authenticate";
 import { Request, Response  } from "express";
@@ -11,6 +11,7 @@ interface AuthRequest extends Request{
   auth:{
     sub:string;
     role:number;
+    id:string;
   }   
 }
 
@@ -25,8 +26,8 @@ router.get("/self", authenticate , (req: Request, res) => {
 });
 
 // post is more secure than get
-router.post("/refresh", validateRefreshToken , (req:Request, res:Response)=>{
-  authController.refresh(req as AuthRequest, res);
+router.post("/refresh", validateRefreshToken , (req:Request, res:Response, next: NextFunction)=>{
+  authController.refresh(req as AuthRequest, res, next);
 })
 
 export { router };
