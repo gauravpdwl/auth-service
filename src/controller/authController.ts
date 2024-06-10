@@ -46,7 +46,7 @@ export class AuthController {
 
       const userRepository = AppDataSource.getRepository(User);
 
-      const user = await userRepository.findOne({ where: { email: email }, select:["email","password", "id"] });
+      const user = await userRepository.findOne({ where: { email: email }, select:["email","password", "id", "role"] });
       if (user) {
         const err = createHttpError(400, "User is already present in db");
         throw err;
@@ -106,12 +106,14 @@ export class AuthController {
         expiresAt: new Date(Date.now() + MS_IN_YEAR),
       });
 
-      const refreshToken = jwt.sign(payload, Config.refresh_secret_key!, {
+      const refreshToken = jwt.sign({...payload, id:newRefreshToken.id}, Config.refresh_secret_key!, {
         algorithm: "HS256",
         expiresIn: "1y",
         issuer: "auth-service",
         jwtid: String(newRefreshToken.id),
       });
+
+      console.log("Registration -> Refresh Token ID - ",newRefreshToken.id);
 
       res.cookie("accessToken", accessToken, {
         domain: "localhost",
@@ -149,7 +151,7 @@ export class AuthController {
 
       const userRepository = AppDataSource.getRepository(User);
 
-      const user = await userRepository.findOne({ where: { email: email }, select:["email","password", "id"] });
+      const user = await userRepository.findOne({ where: { email: email }, select:["email","password", "id", "role"] });
       if (!user) {
         const err = createHttpError(404, "Email or Password does not match");
         throw err;
@@ -194,12 +196,14 @@ export class AuthController {
         expiresAt: new Date(Date.now() + MS_IN_YEAR),
       });
 
-      const refreshToken = jwt.sign(payload, Config.refresh_secret_key!, {
+      const refreshToken = jwt.sign({...payload, id:newRefreshToken.id}, Config.refresh_secret_key!, {
         algorithm: "HS256",
         expiresIn: "1y",
         issuer: "auth-service",
         jwtid: String(newRefreshToken.id),
       });
+
+      console.log("Login -> Refresh Token ID - ",newRefreshToken.id);
 
       res.cookie("accessToken", accessToken, {
         domain: "localhost",
@@ -237,6 +241,7 @@ export class AuthController {
   }
 
   async refresh(req: AuthRequest, res: Response){
+    // console.log("req auth ------------> ",req.auth);
     res.json({});
   }
 }

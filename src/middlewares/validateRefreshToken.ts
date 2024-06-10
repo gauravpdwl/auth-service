@@ -8,6 +8,7 @@ import logger from "../config/logger";
 export default expressjwt({
     secret:Config.refresh_secret_key!,
     algorithms:['HS256'],
+
     getToken(req:Request){
         
         type AuthCookies={
@@ -18,10 +19,10 @@ export default expressjwt({
 
         return refreshToken;
     },
-
+    // if anyone revoked the refresh token from db
     async isRevoked(req:Request, token){
 
-        console.log('token', token);
+        // console.log('token', token);
 
         interface IRefreshTokenPayload{
             id:string
@@ -29,6 +30,8 @@ export default expressjwt({
 
         try{
             const refreshTokenRepo=AppDataSource.getRepository(RefreshToken);
+            // console.log("id - ", (token?.payload as IRefreshTokenPayload).id );
+            // console.log("userid sub - ", token?.payload.sub);
             const refreshToken=await refreshTokenRepo.findOne({
                 where:{
                     id: Number((token?.payload as IRefreshTokenPayload).id),
@@ -36,7 +39,7 @@ export default expressjwt({
                 }
             })
 
-            console.log("refreshToken from DB -", refreshToken);
+            // console.log("refreshToken from DB -", refreshToken);
 
             return refreshToken === null;
         }catch(err){
@@ -45,4 +48,4 @@ export default expressjwt({
 
         return true;
     }
-})
+});
