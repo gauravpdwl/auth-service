@@ -29,6 +29,7 @@ interface AuthRequest extends Request{
 }
 
 export class AuthController {
+  
   async register(req: RegisteredUser, res: Response, next: NextFunction) {
     try {
       const { firstName, lastName, email, password } = req.body;
@@ -45,7 +46,7 @@ export class AuthController {
 
       const userRepository = AppDataSource.getRepository(User);
 
-      const user = await userRepository.findOne({ where: { email: email }, select:["email","password"] });
+      const user = await userRepository.findOne({ where: { email: email }, select:["email","password", "id"] });
       if (user) {
         const err = createHttpError(400, "User is already present in db");
         throw err;
@@ -148,7 +149,7 @@ export class AuthController {
 
       const userRepository = AppDataSource.getRepository(User);
 
-      const user = await userRepository.findOne({ where: { email: email }, select:["email","password"] });
+      const user = await userRepository.findOne({ where: { email: email }, select:["email","password", "id"] });
       if (!user) {
         const err = createHttpError(404, "Email or Password does not match");
         throw err;
@@ -171,6 +172,7 @@ export class AuthController {
         next(error);
         return;
       }
+
 
       const payload: JwtPayload = {
         sub: String(user.id),
@@ -232,5 +234,9 @@ export class AuthController {
     const user=await userRepository.findOneBy({id: Number(req.auth.sub)});
 
     res.status(200).json(user?.id);
+  }
+
+  async refresh(req: AuthRequest, res: Response){
+    res.json({});
   }
 }
