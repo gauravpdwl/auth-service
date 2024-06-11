@@ -6,7 +6,7 @@ import { AppDataSource } from "../../config/data-source";
 import { User } from "../../entity/User";
 import { RefreshToken } from "../../entity/RefreshToken";
 
-describe.skip("POST /auth/register", () => {
+describe("POST /auth/register", () => {
   describe("given all fields", () => {
     let connection: DataSource;
 
