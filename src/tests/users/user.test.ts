@@ -5,7 +5,7 @@ import { AppDataSource } from "../../config/data-source";
 import createJWKSMock from 'mock-jwks';
 import { User } from "../../entity/User";
 
-describe.skip("GET auth/self/", () => {
+describe("GET auth/self/", () => {
   describe("Login with token", () => {
     
     let connection: DataSource;

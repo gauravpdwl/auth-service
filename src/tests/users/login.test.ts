@@ -3,7 +3,7 @@ import { AppDataSource } from "../../config/data-source";
 import app from "../../config/app";
 import request from "supertest";
 
-describe.skip("POST /auth/login", () => {
+describe("POST /auth/login", () => {
   describe("For all fields", () => {
     let connection: DataSource;
 

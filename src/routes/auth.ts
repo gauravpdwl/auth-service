@@ -11,7 +11,7 @@ const authController = new AuthController();
 interface AuthRequest extends Request{
   auth:{
     sub:string;
-    role:number;
+    role:string;
     id:string;
   }   
 }
