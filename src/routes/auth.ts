@@ -3,6 +3,7 @@ import { AuthController } from "../controller/authController";
 import authenticate from "../middlewares/authenticate";
 import { Request, Response  } from "express";
 import validateRefreshToken from "../middlewares/validateRefreshToken";
+import parseRefreshToken from "../middlewares/parseRefreshToken";
 
 const router = express.Router();
 const authController = new AuthController();
@@ -29,5 +30,9 @@ router.get("/self", authenticate , (req: Request, res) => {
 router.post("/refresh", validateRefreshToken , (req:Request, res:Response, next: NextFunction)=>{
   authController.refresh(req as AuthRequest, res, next);
 })
+
+router.post("/logout", authenticate, parseRefreshToken , (req: Request, res, next) => {
+  return authController.logout(req as AuthRequest , res, next);
+});
 
 export { router };

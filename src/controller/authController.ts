@@ -324,4 +324,24 @@ export class AuthController {
       next(err);
     }
   }
+
+  async logout(req:AuthRequest, res: Response, next:NextFunction){
+    try{
+      
+      // console.log(req.auth);
+      const refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+      await refreshTokenRepository.delete({id: Number(req.auth.id)});
+
+      logger.info("Refresh token has been deleted", {id:req.auth.id});
+      logger.info("User has been logged Out", {id:req.auth.sub});
+
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
+      res.json({message:"User is logged out"});
+
+    }catch(err){
+      next(err);
+    }
+  }
 }
