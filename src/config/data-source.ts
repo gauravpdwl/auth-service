@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { User } from "../entity/User";
+// import { User } from "../entity/User";
 
 import { Config } from "./config";
-import { RefreshToken } from "../entity/RefreshToken";
+// import { RefreshToken } from "../entity/RefreshToken";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -16,7 +16,8 @@ export const AppDataSource = new DataSource({
   // if it detects any changes in db schema it creates new database
   synchronize: true,
   logging: false,
-  entities: [User, RefreshToken],
+  // entities: [User, RefreshToken],
+  entities:["src/entity/*.ts"],
   migrations: ["src/migration/*.ts"],
   subscribers: [],
 });
