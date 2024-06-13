@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --runInBand --detectOpenHandles",
+    "test:watch": "jest --no-cache --watch --runInBand --detectOpenHandles",
+    "test":"jest --coverage --all --runInBand",
     "prepare": "husky install",
     "dev": "cross-env node_env=dev nodemon src/server.ts",
     "build":"tsc",
