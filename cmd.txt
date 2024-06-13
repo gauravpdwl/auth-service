@@ -12,3 +12,19 @@ docker pull postgres
 docker volume create mernpgdata
 docker run --rm --name mern_postgres_dbserver -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v mernpgdata:/var/lib/postgresql/data -p 5432:5432 -d postgres:latest
 docker exec -it mern_postgres_dbserver psql db_name
+
+**Ignore pattern for files and folders
+module.exports = {
+  preset: "ts-jest",
+  testEnvironment: "node",
+  verbose: true,
+  testPathIgnorePatterns: [
+    "/node_modules/",      // Ignore node_modules folder
+    "/dist/",              // Ignore dist folder (commonly used for build output)
+    "/ignored-folder/",    // Ignore a specific folder
+    "\\.ignored\\.ts$",    // Ignore files with a specific pattern
+    "ignored-file.ts"      // Ignore a specific file
+  ]
+}
+
+npm run migration:create ./src/migration/add_refreshtoken_cascade
