@@ -27,4 +27,12 @@ module.exports = {
   ]
 }
 
+**when you want to make change in db table structure like 
+updating column name or adding on delete cascade you need to create empty
+migration and then you need to write custome script which will make changes in database.
+ 
 npm run migration:create ./src/migration/add_refreshtoken_cascade
+
+**to build and run application
+npm run build
+node_env=dev node src/server.js 
