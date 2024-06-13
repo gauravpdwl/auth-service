@@ -3,6 +3,7 @@ import logger from "./logger";
 import { HttpError } from "http-errors";
 import { router as authRouter } from "../routes/auth";
 import tenantRouter from '../routes/tenant';
+import userRouter from '../routes/user';
 import "reflect-metadata";
 import { Config } from "./config";
 import cookieParser from "cookie-parser";
@@ -23,6 +24,8 @@ app.get("/", (req, res) => {
 app.use("/auth", authRouter);
 
 app.use("/tenants", tenantRouter);
+
+app.use('/users', userRouter)
 
 // global error handler middleware
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
