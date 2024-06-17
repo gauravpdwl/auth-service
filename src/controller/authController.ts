@@ -94,7 +94,7 @@ export class AuthController {
 
       const accessToken = jwt.sign(payload, privatekey, {
         algorithm: "RS256",
-        expiresIn: "1h",
+        expiresIn: "1m",
         issuer: "auth-service",
       });
 
@@ -119,7 +119,7 @@ export class AuthController {
       res.cookie("accessToken", accessToken, {
         domain: "localhost",
         sameSite: "strict",
-        maxAge: 1000 * 60 * 60, //expires in 1h
+        maxAge: 1000 * 60, //expires in 1h
         httpOnly: true,
       });
 
@@ -184,7 +184,7 @@ export class AuthController {
 
       const accessToken = jwt.sign(payload, privatekey, {
         algorithm: "RS256",
-        expiresIn: "1h",
+        expiresIn: "1m",
         issuer: "auth-service",
       });
 
@@ -209,7 +209,7 @@ export class AuthController {
       res.cookie("accessToken", accessToken, {
         domain: "localhost",
         sameSite: "strict",
-        maxAge: 1000 * 60 * 60, //expires in 1h
+        maxAge: 1000 * 60, //expires in 1h
         httpOnly: true,
       });
 
@@ -238,7 +238,7 @@ export class AuthController {
     const userRepository = AppDataSource.getRepository(User);
     const user=await userRepository.findOneBy({id: Number(req.auth.sub)});
 
-    res.status(200).json(user?.id);
+    res.status(200).json(user);
   }
 
   async refresh(req: AuthRequest, res: Response, next: NextFunction){
@@ -265,7 +265,7 @@ export class AuthController {
 
       const accessToken = jwt.sign(payload, privatekey, {
         algorithm: "RS256",
-        expiresIn: "1h",
+        expiresIn: "1m",
         issuer: "auth-service",
       });
 
@@ -301,7 +301,7 @@ export class AuthController {
       res.cookie("accessToken", accessToken, {
         domain: "localhost",
         sameSite: "strict",
-        maxAge: 1000 * 60 * 60, //expires in 1h
+        maxAge: 1000 * 60, //expires in 1h
         httpOnly: true,
       });
 

@@ -36,3 +36,6 @@ npm run migration:create ./src/migration/add_refreshtoken_cascade
 **to build and run application
 npm run build
 node_env=dev node src/server.js 
+
+docker build -t auth-service -f docker/production/Dockerfile .
+docker run -p 8000:8000 auth-service:latest

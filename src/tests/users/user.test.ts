@@ -68,7 +68,7 @@ describe("GET auth/self/", () => {
       .set("Cookie", [`accessToken=${accessToken};`])
       .send();
 
-      expect(response.body as Record<string, string>).toBe(data.id);
+      expect(response.body.id as Record<string, string>).toBe(data.id);
     });
 
     it("should not return the passwod field", async ()=>{
