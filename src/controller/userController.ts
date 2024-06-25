@@ -70,7 +70,7 @@ export class UserController {
         email,
         password: hashedPassword,
         role,
-        tenantId,
+        tenant: tenantId ? { id: Number(tenantId) } : undefined,
       });
 
       (Config.node_env === "prod" || Config.node_env === "dev") &&
@@ -148,6 +148,7 @@ export class UserController {
       }
 
       const result = await queryBuilder
+        .leftJoinAndSelect("user.tenant","tenant")
         .skip((currentPage - 1) * perPage)
         .take(perPage)
         .orderBy("user.id", "DESC")
