@@ -15,6 +15,7 @@ interface userData {
   lastName: string;
   email: string;
   password: string;
+  role:string;
 }
 
 interface RegisteredUser extends Request {
@@ -33,7 +34,7 @@ export class AuthController {
   
   async register(req: RegisteredUser, res: Response, next: NextFunction) {
     try {
-      const { firstName, lastName, email, password } = req.body;
+      const { firstName, lastName, email, password, role } = req.body;
 
       if (!email) {
         const err = createHttpError(400, "email field is empty");
@@ -44,6 +45,7 @@ export class AuthController {
       lastName.trim();
       email.trim();
       password.trim();
+      role.trim()
 
       const userRepository = AppDataSource.getRepository(User);
 
@@ -61,7 +63,7 @@ export class AuthController {
         lastName,
         email,
         password: hashedPassword,
-        role: "customer",
+        role,
       });
 
       (Config.node_env === "prod" || Config.node_env === "dev") &&
@@ -94,7 +96,7 @@ export class AuthController {
 
       const accessToken = jwt.sign(payload, privatekey, {
         algorithm: "RS256",
-        expiresIn: "1m",
+        expiresIn: "1h",
         issuer: "auth-service",
       });
 
@@ -119,7 +121,7 @@ export class AuthController {
       res.cookie("accessToken", accessToken, {
         domain: "localhost",
         sameSite: "strict",
-        maxAge: 1000 * 60, //expires in 1h
+        maxAge: 1000 * 60 * 60, //expires in 1h
         httpOnly: true,
       });
 
@@ -184,7 +186,7 @@ export class AuthController {
 
       const accessToken = jwt.sign(payload, privatekey, {
         algorithm: "RS256",
-        expiresIn: "1m",
+        expiresIn: "1h",
         issuer: "auth-service",
       });
 
@@ -209,7 +211,7 @@ export class AuthController {
       res.cookie("accessToken", accessToken, {
         domain: "localhost",
         sameSite: "strict",
-        maxAge: 1000 * 60, //expires in 1h
+        maxAge: 1000 * 60 * 60, //expires in 1h
         httpOnly: true,
       });
 
@@ -236,7 +238,16 @@ export class AuthController {
     // console.log(req.auth);
 
     const userRepository = AppDataSource.getRepository(User);
-    const user=await userRepository.findOneBy({id: Number(req.auth.sub)});
+    const user=await userRepository.findOne(
+      {
+        where:{
+          id: Number(req.auth.sub)
+        },
+        relations:{
+          tenant:true
+        }
+      
+      });
 
     res.status(200).json(user);
   }
@@ -265,7 +276,7 @@ export class AuthController {
 
       const accessToken = jwt.sign(payload, privatekey, {
         algorithm: "RS256",
-        expiresIn: "1m",
+        expiresIn: "1h",
         issuer: "auth-service",
       });
 
@@ -301,7 +312,7 @@ export class AuthController {
       res.cookie("accessToken", accessToken, {
         domain: "localhost",
         sameSite: "strict",
-        maxAge: 1000 * 60, //expires in 1h
+        maxAge: 1000 * 60 * 60, //expires in 1h
         httpOnly: true,
       });
 

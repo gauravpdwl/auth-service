@@ -1,3 +1,4 @@
+console.log("UV_THREADPOOL_SIZE: ",process.env.UV_THREADPOOL_SIZE);
 import app from "./config/app";
 import { Config } from "./config/config";
 import { AppDataSource } from "./config/data-source";

@@ -6,9 +6,9 @@ import tenantadmincheck from '../middlewares/tenantadmincheck';
 const router=express.Router();
 const tenantController=new TenantController()
 
-router.post('/', authenticate, tenantadmincheck(['admin']), (req, res, next)=> tenantController.create(req, res, next));
+router.post('/', authenticate, tenantadmincheck(['admin','customer']), (req, res, next)=> tenantController.create(req, res, next));
 
-router.get('/all', authenticate, tenantadmincheck(['admin']), (req, res, next)=> tenantController.all(req, res, next));
+router.get('/all', authenticate, tenantadmincheck(['admin', 'customer']), (req, res, next)=> tenantController.all(req, res, next));
 
 router.get('/:id', authenticate, tenantadmincheck(['admin']), (req, res, next)=> tenantController.single(req, res, next));
 

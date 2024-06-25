@@ -9,7 +9,7 @@ export default expressjwt({
     secret: JwksClient.expressJwtSecret({
         jwksUri: Config.jwks_uri!,
         cache:false,
-        rateLimit:true
+        rateLimit:false
     }) as GetVerificationKey,
     algorithms:['RS256'],
     // default fetches from headers 
