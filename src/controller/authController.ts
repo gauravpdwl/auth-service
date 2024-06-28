@@ -34,18 +34,18 @@ export class AuthController {
   
   async register(req: RegisteredUser, res: Response, next: NextFunction) {
     try {
-      const { firstName, lastName, email, password, role } = req.body;
+      let { firstName, lastName, email, password, role } = req.body;
 
       if (!email) {
         const err = createHttpError(400, "email field is empty");
         throw err;
       }
 
-      firstName.trim();
-      lastName.trim();
-      email.trim();
-      password.trim();
-      role.trim()
+      firstName=firstName.trim();
+      lastName=lastName.trim();
+      email=email.trim();
+      password=password.trim();
+      role=role.trim()
 
       const userRepository = AppDataSource.getRepository(User);
 
@@ -142,15 +142,15 @@ export class AuthController {
 
   async login(req: RegisteredUser, res: Response, next: NextFunction) {
     try {
-      const {email, password } = req.body;
+      let {email, password } = req.body;
 
       if (!email || !password) {
         const err = createHttpError(400, "email or password field is empty");
         throw err;
       }
 
-      email.trim();
-      password.trim();
+      email=email.trim();
+      password=password.trim();
 
       const userRepository = AppDataSource.getRepository(User);
 

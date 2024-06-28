@@ -20,7 +20,7 @@ interface RegisteredUser extends Request {
   body: userData;
 }
 
-interface AuthRequest extends Request {
+interface AuthRequest extends RegisteredUser {
   auth: {
     sub: string;
     role: string;
@@ -40,18 +40,21 @@ interface QueryRequest extends AuthRequest {
 export class UserController {
   async create(req: RegisteredUser, res: Response, next: NextFunction) {
     try {
-      const { firstName, lastName, email, password, role, tenantId } = req.body;
+      let { firstName, lastName, email, password, role, tenantId } = req.body;
 
       if (!email) {
         const err = createHttpError(400, "email field is empty");
         throw err;
       }
 
-      firstName.trim();
-      lastName.trim();
-      email.trim();
-      password.trim();
-      role.trim();
+      firstName=firstName.trim();
+      lastName=lastName.trim();
+      email=email.trim();
+      password=password.trim();
+      role=role.trim();
+
+      // eslint-disable-next-line no-self-assign
+      tenantId=tenantId
 
       const userRepository = AppDataSource.getRepository(User);
 
@@ -204,7 +207,7 @@ export class UserController {
 
   async update(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const { firstName, lastName, email, password, role, tenantId } = req.body;
+      let { firstName, lastName, role, tenantId } = req.body;
       const id = req.params.id;
 
       if (!id) {
@@ -213,10 +216,8 @@ export class UserController {
       }
 
       if (
-        !email ||
         !firstName ||
         !lastName ||
-        !password ||
         !role ||
         !tenantId
       ) {
@@ -224,15 +225,20 @@ export class UserController {
         throw err;
       }
 
+      firstName=firstName.trim();
+      lastName=lastName.trim();
+      role=role.trim();
+      // eslint-disable-next-line no-self-assign
+      tenantId=tenantId
+
       // console.log("params id -> ",id);
 
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.update(id, {
         firstName,
         lastName,
-        email,
-        password,
         role,
+        tenant: { id: Number(tenantId) },
       });
 
       if (!user) {
