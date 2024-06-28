@@ -218,12 +218,13 @@ export class UserController {
       if (
         !firstName ||
         !lastName ||
-        !role ||
-        !tenantId
+        !role
       ) {
         const err = createHttpError(400, "Fields are empty");
         throw err;
       }
+
+      console.log("tenant value - ", tenantId);
 
       firstName=firstName.trim();
       lastName=lastName.trim();
@@ -238,7 +239,7 @@ export class UserController {
         firstName,
         lastName,
         role,
-        tenant: { id: Number(tenantId) },
+        tenant: tenantId ? { id: Number(tenantId) } : null,
       });
 
       if (!user) {
