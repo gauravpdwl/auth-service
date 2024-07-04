@@ -27,6 +27,7 @@ interface AuthRequest extends Request{
       sub:string;
       role:string;
       id:string;
+      tenant:string;
     }   
 }
 
@@ -154,7 +155,12 @@ export class AuthController {
 
       const userRepository = AppDataSource.getRepository(User);
 
-      const user = await userRepository.findOne({ where: { email: email }, select:["email","password", "id", "role"] });
+      const user = await userRepository.findOne({ 
+        where: { email: email }, 
+        select:["email","password", "id", "role", "tenant"], 
+        relations:{ tenant:true }
+       });
+
       if (!user) {
         const err = createHttpError(404, "Email or Password does not match");
         throw err;
@@ -182,6 +188,7 @@ export class AuthController {
       const payload: JwtPayload = {
         sub: String(user.id),
         role: user.role,
+        tenant: user.tenant ? user.tenant.id : "" 
       };
 
       const accessToken = jwt.sign(payload, privatekey, {
@@ -257,9 +264,23 @@ export class AuthController {
 
     try{
 
+    const userRepository = AppDataSource.getRepository(User);
+
+    const user= await userRepository.findOne({ 
+      where: { id: Number(req.auth.sub) }, 
+      select:["email","password", "id", "role", "tenant"],
+      relations:{ tenant:true }
+    });
+
+    if (!user) {
+      const err = createHttpError(404, "USER not present for given Token");
+      throw err;
+    }
+
       const payload: JwtPayload = {
         sub: String(req.auth.sub),
         role: req.auth.role,
+        tenant: req.auth.tenant
       };
 
       let privatekey: Buffer;
@@ -280,13 +301,6 @@ export class AuthController {
         issuer: "auth-service",
       });
 
-      const userRepository = AppDataSource.getRepository(User);
-
-      const user = await userRepository.findOne({ where: { id: Number(req.auth.sub) }, select:["email","password", "id", "role"] });
-      if (!user) {
-        const err = createHttpError(404, "USER not present for given Token");
-        throw err;
-      }
       // Persist the refresh token in DB
 
       const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365;
