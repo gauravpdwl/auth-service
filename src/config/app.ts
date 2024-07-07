@@ -13,7 +13,7 @@ import { globalErrorHandler } from "../middlewares/globalErrorHandler";
 const app = express();
 
 app.use(cors({
-  origin:["http://localhost:5173"],
+  origin:["http://localhost:5173", "http://localhost:8000"],
   credentials: true
 }));
 app.use(express.static("public"));
