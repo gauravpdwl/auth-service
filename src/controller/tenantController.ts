@@ -13,6 +13,14 @@ interface TenantRequest extends Request{
     body:TenantData
 }
 
+interface QueryRequest extends TenantRequest{
+    query: {
+      currentPage: string;
+      perPage: string;
+      q:string;
+    }
+}
+
 
 export class TenantController{
 
@@ -40,11 +48,49 @@ export class TenantController{
         }
     }
 
-    async all(req: TenantRequest, res: Response, next:NextFunction){
+    async all(req: QueryRequest, res: Response, next:NextFunction){
+
+    let currentPage = 1,
+      perPage = 10,
+      q = "";
+
+        if (req.query) {
+        if (req.query.currentPage) {
+            const cp = req.query.currentPage.trim();
+            currentPage = Number(cp);
+        }
+
+        if (req.query.perPage) {
+            const pp = req.query.perPage.trim();
+            perPage = Number(pp);
+        }
+
+        if (req.query.q) {
+            const searchquery = req.query.q.trim();
+            q = `%${searchquery}%`;
+        }
+        }
+
         try{
 
             const tenantRepository = AppDataSource.getRepository(Tenant);
-            const allTenants=await tenantRepository.find();
+            const queryBuilder = tenantRepository.createQueryBuilder("tenant");
+            if(q){
+                queryBuilder.where("tenant.name ILike :q", {q:q})
+            }
+
+            const result=await queryBuilder
+                .skip((currentPage - 1) * perPage)
+                .take(perPage)
+                .orderBy("tenant.id", "DESC")
+                .getManyAndCount();
+
+            const allTenants={
+                currentPage,
+                perPage,
+                data: result[0],
+                total: result[1],
+            }
 
             logger.info("All tenants are fetched from db");
 
