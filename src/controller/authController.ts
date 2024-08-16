@@ -25,6 +25,9 @@ interface RegisteredUser extends Request {
 interface AuthRequest extends Request{
     auth:{
       sub:string;
+      firstName: string;
+      lastName: string;
+      email: string;
       role:string;
       id:string;
       tenant:string;
@@ -93,6 +96,9 @@ export class AuthController {
       const payload: JwtPayload = {
         sub: String(newuser.id),
         role: newuser.role,
+        firstName: newuser.firstName,
+        lastName: newuser.lastName,
+        email: newuser.email
       };
 
       const accessToken = jwt.sign(payload, privatekey, {
@@ -157,7 +163,7 @@ export class AuthController {
 
       const user = await userRepository.findOne({ 
         where: { email: email }, 
-        select:["email","password", "id", "role", "tenant"], 
+        select:["email","password", "id", "role", "tenant", "firstName", "lastName"], 
         relations:{ tenant:true }
        });
 
@@ -188,7 +194,10 @@ export class AuthController {
       const payload: JwtPayload = {
         sub: String(user.id),
         role: user.role,
-        tenant: user.tenant ? user.tenant.id : "" 
+        tenant: user.tenant ? user.tenant.id : "",
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
       };
 
       const accessToken = jwt.sign(payload, privatekey, {
@@ -280,7 +289,10 @@ export class AuthController {
       const payload: JwtPayload = {
         sub: String(req.auth.sub),
         role: req.auth.role,
-        tenant: req.auth.tenant
+        tenant: req.auth.tenant,
+        email: req.auth.email,
+        firstName: req.auth.firstName,
+        lastName: req.auth.lastName
       };
 
       let privatekey: Buffer;

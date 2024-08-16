@@ -10,10 +10,13 @@ const authController = new AuthController();
 
 interface AuthRequest extends Request{
   auth:{
-    sub:string;
-    role:string;
-    id:string;
-    tenant:string;
+      sub:string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      role:string;
+      id:string;
+      tenant:string;
   }   
 }
 
